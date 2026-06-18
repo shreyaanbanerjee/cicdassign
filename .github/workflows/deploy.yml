@@ -1,4 +1,4 @@
-name: Automate Infrastructure Deployment
+name: Automate Infrastructure Teardown
 
 # This tells GitHub to run this pipeline ONLY when new code is pushed to the main branch
 on:
@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  deploy-cloudformation:
+  delete-cloudformation:
     runs-on: ubuntu-latest # This is the virtual machine GitHub provides for free
     
     steps:
@@ -23,11 +23,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      # Step 3: The pipeline runs the deployment command automatically
-      # Note: We use 'deploy' instead of 'create-stack' because 'deploy' is smart enough 
-      # to create the stack if it's new, OR update the stack if it already exists!
-      - name: Deploy CloudFormation Stack
+      # Step 3: The pipeline runs the deletion command automatically
+      - name: Delete CloudFormation Stack
         run: |
-          aws cloudformation deploy \
-            --template-file template2.yaml \
-            --stack-name automated-cicd-stack
+          aws cloudformation delete-stack --stack-name automated-cicd-stack
