@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  customvpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      Tags:
+        - Key: name
+          Value: assignment-vpc
+  publicsubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref customvpc
+      CidrBlock: 10.0.1.0/24
+      Tags:
+        - Key: name
+          Value: assignment-subnet
+  internetgateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: name
+          Value: assignment-igw
+  vpcgatewayattachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref customvpc
+      InternetGatewayId: !Ref internetgateway
+  publicroutetable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref customvpc
+      Tags:
+        - Key: name
+          Value: assignment-rt
+  publicroute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref publicroutetable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref internetgateway
+  subnetroutetableassociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref publicsubnet
+      RouteTableId: !Ref publicroutetable
