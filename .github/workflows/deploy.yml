@@ -29,5 +29,5 @@ jobs:
       - name: Deploy CloudFormation Stack
         run: |
           aws cloudformation deploy \
-            --template-file template.yaml \
+            --template-file template2.yaml \
             --stack-name automated-cicd-stack
