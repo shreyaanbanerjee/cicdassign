@@ -1,0 +1,33 @@
+name: Automate Infrastructure Deployment
+
+# This tells GitHub to run this pipeline ONLY when new code is pushed to the main branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-cloudformation:
+    runs-on: ubuntu-latest # This is the virtual machine GitHub provides for free
+    
+    steps:
+      # Step 1: The virtual machine downloads your repository code
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+
+      # Step 2: We use an official AWS tool to securely log into your account using your hidden secrets
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      # Step 3: The pipeline runs the deployment command automatically
+      # Note: We use 'deploy' instead of 'create-stack' because 'deploy' is smart enough 
+      # to create the stack if it's new, OR update the stack if it already exists!
+      - name: Deploy CloudFormation Stack
+        run: |
+          aws cloudformation deploy \
+            --template-file template.yaml \
+            --stack-name automated-cicd-stack
